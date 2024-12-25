@@ -19,16 +19,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['@ffmpeg/ffmpeg'],
   },
-  build: {
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.wasm')) {
-            return 'assets/[name]-[hash][extname]';
-          }
-          return 'assets/[name]-[hash][extname]';
-        },
-      },
-    },
-  },
 });
