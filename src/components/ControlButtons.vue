@@ -12,7 +12,7 @@ const { t } = useI18n();
 const fileDataStore = useFileDataStore();
 const { files } = storeToRefs(fileDataStore);
 
-const getUncompressedFiles = (fileObj: FileObj) => !fileObj.isCompressed;
+const getUncompressedFiles = (fileObj: FileObj) => !fileObj.isCompressed && ['image', 'video'].includes(fileObj.file.type.split('/')[0]);
 
 const isCompressing = ref(false);
 const zipData = ref('');
@@ -28,11 +28,11 @@ const workerThreadAmount = Math.min(workerLimit, availableThreads);
 
 async function editFileObj(fileObj: FileObj) {
   try {
-    const compressedFile = await compressFile(fileObj.file);
+    const compressedFile = await compressFile(fileObj.file, fileObj);
     fileObj.file = compressedFile;
     fileObj.isCompressed = true;
     fileObj.isError = false;
-  } catch {
+  } catch (error) {
     fileObj.isError = true;
   }
 }

@@ -21,12 +21,22 @@ watchEffect(() => {
   }
 });
 
+const isVideo = computed(() => props.fileObj.file.type.startsWith('video'));
+
 const objectUrl = computed(() => URL.createObjectURL(props.fileObj.file));
 
-watch(objectUrl, (_, oldUrl) => URL.revokeObjectURL(oldUrl));
+watch(objectUrl, (_, oldUrl) => {
+  if (oldUrl) {
+    URL.revokeObjectURL(oldUrl);
+  }
+});
 
-const computeFileSize = (size: number) =>
-  (size / (1024 * 1024)).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }); // NoSonar this is to convert byte to MB
+const computeFileSize = (size: number) => {
+  if (size >= 1024 * 1024 * 1024) {
+    return (size / (1024 * 1024 * 1024)).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'GB';
+  }
+  return (size / (1024 * 1024)).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'MB';
+};
 
 onUnmounted(() => URL.revokeObjectURL(objectUrl.value));
 </script>
@@ -34,27 +44,23 @@ onUnmounted(() => URL.revokeObjectURL(objectUrl.value));
 <template>
   <div class="file-item">
     <div class="item-set">
-      <a
-        :href="objectUrl"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        <img
-          :src="objectUrl"
-          alt="Preview"
-          class="preview"
-          width="200"
-        />
+      <a :href="objectUrl" rel="noopener noreferrer" target="_blank">
+        <template v-if="isVideo">
+          <video :src="objectUrl" controls class="preview" width="200"></video>
+        </template>
+        <template v-else>
+          <img :src="objectUrl" alt="Preview" class="preview" width="200" />
+        </template>
       </a>
       <div>
         <div>
           <span class="field-title">{{ t('translation.name') }}</span> {{ fileObj.file.name }}
         </div>
         <div>
-          <span class="field-title">{{ t('translation.originalsize') }}</span> {{ computeFileSize(orgSize) }}MB
+          <span class="field-title">{{ t('translation.originalsize') }}</span> {{ computeFileSize(orgSize) }}
         </div>
         <div v-if="compSize">
-          <span class="field-title">{{ t('translation.compressedsize') }}</span> {{ computeFileSize(compSize) }}MB
+          <span class="field-title">{{ t('translation.compressedsize') }}</span> {{ computeFileSize(compSize) }}
         </div>
         <div
           v-if="fileObj.isError"
@@ -114,5 +120,11 @@ onUnmounted(() => URL.revokeObjectURL(objectUrl.value));
     width: auto;
     margin: 0;
   }
+}
+.preview {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 </style>
