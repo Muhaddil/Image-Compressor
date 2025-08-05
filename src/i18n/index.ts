@@ -3,12 +3,14 @@ import Español from './es-ES';
 import English from './en-EN';
 import Euskara from './eu-EU';
 import Deutsch from './de-DE';
+import Française from './fr-FR';
 
 const messages = {
   Español,
   English,
   Euskara,
   Deutsch,
+  Française,
 };
 
 const languageMap = {
@@ -16,6 +18,7 @@ const languageMap = {
   English: ['en', 'en-EN', 'en-GB', 'en-US'],
   Euskara: ['eu', 'eu-EU'],
   Deutsch: ['de', 'de-DE'],
+  Française: ['fr', 'fr-FR'],
 };
 
 const langEntries = Object.entries(languageMap);
